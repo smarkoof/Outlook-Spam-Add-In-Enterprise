@@ -1,0 +1,113 @@
+# ============================================================================
+#  branding.conf — SOURCE UNIQUE de personnalisation de la solution.
+#  Éditez les valeurs entre "guillemets", puis lancez :  ./scripts/02_customize.sh
+#  (idempotent). Guide détaillé : PERSONNALISATION.md / CUSTOMIZATION.md
+#  Valeurs livrées GÉNÉRIQUES et volontairement INOPÉRANTES (adresses
+#  défangées [.]) : remplacez-les par celles de VOTRE organisation.
+#  Règles : pas de guillemets " ni de chevrons < > dans les valeurs.
+# ============================================================================
+
+# ---- Identité / marque (visible par l'utilisateur) -------------------------
+
+# Nom du produit : gestionnaire de compléments, installeur, ARP, DLL/.vsto.
+PRODUCT_NAME="BoutonSPAM"
+
+# Votre entité — affichée comme « Éditeur » du logiciel.
+COMPANY_NAME="MonOrganisation"
+
+# Description de l'assembly (peut rester telle quelle).
+PRODUCT_DESCRIPTION="Spam/phishing reporter Plug-In for Outlook"
+
+# Lien support (ARP). URL http:// ou https:// UNIQUEMENT — jamais mailto:
+# (Visual Studio refuserait d'ouvrir Setup.vdproj). Contact e-mail = REPORT_TO.
+SUPPORT_URL="https://cert.mondomaine.fr"
+
+# Votre entité + année (assembly + LICENSE.md).
+COPYRIGHT="Copyright © 2026 MonOrganisation"
+
+# 4 segments ; ne JAMAIS diminuer ; à incrémenter à chaque build.
+VERSION="1.0.0.0"
+
+# ---- Déploiement -----------------------------------------------------------
+
+# Sous-dossier d'installation sous %ProgramFiles%\<ICI>\<PRODUCT_NAME>.
+INSTALL_FOLDER="MonOrganisation"
+
+# Nom de base du MSI (SANS espace) ; la version est accolée automatiquement.
+MSI_BASENAME="OutlookSpamAddin"
+
+# Nom du dossier/projet côté dépôt (dev uniquement, cf. 90_rename-project.sh).
+PROJECT_SLUG="OutlookSpamAddin"
+
+# Clé registre de la config par poste — à ne changer qu'en connaissance de cause.
+REGISTRY_CONFIG_KEY="SOFTWARE\OutlookSpamAddin"
+
+# ---- Adresses & filtres embarqués par défaut (surchargeables par poste) ----
+
+# Boîte abuse destinataire des signalements (plusieurs adresses : séparées par ;).
+# Les exemples [.] sont INOPÉRANTS (fail-close) : mettez VOS adresses, SANS crochets.
+REPORT_TO="abuse@mondomaine[.]fr"
+
+# Copie du rapport ("" = pas de Cc).
+REPORT_CC="spam@mondomaine[.]fr"
+
+# Regex reconnaissant vos expéditeurs INTERNES (avertissement avant signalement).
+# Mode d'emploi et exemples : PERSONNALISATION.md, section « Écrire REGEX_INTERNAL ».
+REGEX_INTERNAL="(@mondomaine\.fr$|@.*\.mondomaine\.fr$)"
+
+# ---- Textes utilisateur (FR + EN ; valeur vide "" = texte actuel conservé) --
+# Après modification : ./scripts/02_customize.sh puis RECOMPILER (nouvelle VERSION).
+
+# Libellé du bouton du ruban (2 à 4 mots, verbe d'action).
+UI_BUTTON_FR="Rapporter un Spam à Abuse"
+UI_BUTTON_EN="Report Spam at Abuse"
+
+# Nom du groupe dans le ruban (étiquette sous le bouton).
+UI_GROUP_FR="MonOrganisationSSI"
+UI_GROUP_EN="MonOrganisationSSI"
+
+# Description courte au survol du bouton.
+UI_BUTTON_TIP_FR="Transmet l'email sélectionné à MonOrganisationSSI pour analyse."
+UI_BUTTON_TIP_EN="Report this suspicious message to the security team."
+
+# Grande info-bulle d'aide (1 à 2 phrases).
+UI_BUTTON_SUPERTIP_FR="Transmet le message sélectionné à l'équipe sécurité pour analyse, puis le retire de votre boîte. Utilisez-le au moindre doute : mieux vaut un signalement de trop qu'un clic de trop."
+UI_BUTTON_SUPERTIP_EN="Forwards the selected message to the security team for analysis, then removes it from your inbox. When in doubt, report it."
+
+# Titre de la boîte de confirmation avant envoi.
+UI_CONFIRM_TITLE_FR="Confirmer le signalement à MonOrganisationSSI"
+UI_CONFIRM_TITLE_EN="Report this message to the security team"
+
+# Phrase d'introduction du rapport (vue par vos analystes, pas par l'utilisateur).
+UI_REPORT_BODY_FR="Signalement utilisateur : merci d'analyser le message en pièce jointe."
+UI_REPORT_BODY_EN="User-submitted report: please review the attached message."
+
+# Accusé de réception automatique au signaleur — objet (activation par poste :
+# valeur registre SendAcknowledgment).
+UI_ACK_SUBJECT_FR="Votre signalement a bien été transmis à MonOrganisationSSI"
+UI_ACK_SUBJECT_EN="Your report has been received"
+
+# Corps de l'accusé : surcharge OPTIONNELLE en texte simple. Vide "" = corps
+# HTML mis en forme de Config.vb conservé (constantes ackBody*, cf. PERSONNALISATION.md).
+UI_ACK_BODY_FR=""
+UI_ACK_BODY_EN=""
+# (plusieurs signalements — garder le {0} = nombre de messages)
+UI_ACK_BODY_MORE_FR=""
+UI_ACK_BODY_MORE_EN=""
+
+# Préfixes d'objet du rapport (règles de tri de la boîte abuse).
+REPORT_SUBJECT_PREFIX="[SPAM]"
+REPORT_SUBJECT_PREFIX_ERROR="[SPAM-ERREUR]"
+
+# ---- Signature de code -----------------------------------------------------
+
+# Empreinte du certificat (magasin Windows) ; vide = repli automatique de 03_sign.ps1.
+CERT_THUMBPRINT=""
+# Horodatage RFC 3161. Le serveur ne répond qu'au POST de signtool : une visite
+# NAVIGATEUR affiche une erreur, c'est normal. Secours : http://timestamp.sectigo.com
+TIMESTAMP_URL="http://timestamp.digicert.com"
+
+# ---- Identité MSI (GUID) ---------------------------------------------------
+
+# 1 = régénérer les GUID, UNE seule fois lors d'un rebranding complet ; sinon 0.
+REGEN_GUIDS=0

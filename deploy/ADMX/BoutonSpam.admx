@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  BoutonSpam.admx : modele de strategie de groupe (GPO) pour l'add-in de
+  signalement de spam. A copier (avec fr-FR\BoutonSpam.adml) dans le magasin
+  central : \\<domaine>\SYSVOL\<domaine>\Policies\PolicyDefinitions\
+  NOTE : la configuration ecrit dans la cle applicative (pas sous \Policies) ;
+  l'editeur GPO peut l'afficher comme "preference" - c'est attendu.
+  Le nom de valeur de la strategie anti-desactivation est synchronise avec
+  PRODUCT_NAME par scripts/02_customize.sh.
+-->
+<policyDefinitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0">
+  <policyNamespaces>
+    <target prefix="boutonspam" namespace="Organisation.Policies.BoutonSpam" />
+    <using prefix="windows" namespace="Microsoft.Policies.Windows" />
+  </policyNamespaces>
+  <resources minRequiredRevision="1.0" />
+  <categories>
+    <category name="CAT_BoutonSpam" displayName="$(string.CAT_BoutonSpam)" />
+  </categories>
+  <policies>
+    <policy name="POL_Config" class="Machine" displayName="$(string.POL_Config)" explainText="$(string.POL_Config_Help)" presentation="$(presentation.POL_Config)" key="SOFTWARE\OutlookSpamAddin">
+      <parentCategory ref="CAT_BoutonSpam" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <elements>
+        <text id="TXT_To" valueName="To" required="true" />
+        <text id="TXT_Cc" valueName="Cc" />
+        <text id="TXT_Regex" valueName="Regex" />
+        <decimal id="DEC_Max" valueName="MaxNumberOfRecipients" minValue="0" maxValue="1000000" />
+        <boolean id="BOOL_Filter" valueName="FilterInternalMessages">
+          <trueValue><decimal value="1" /></trueValue>
+          <falseValue><decimal value="0" /></falseValue>
+        </boolean>
+        <boolean id="BOOL_Ack" valueName="SendAcknowledgment">
+          <trueValue><decimal value="1" /></trueValue>
+          <falseValue><decimal value="0" /></falseValue>
+        </boolean>
+      </elements>
+    </policy>
+    <policy name="POL_NoDisable" class="User" displayName="$(string.POL_NoDisable)" explainText="$(string.POL_NoDisable_Help)" key="Software\Microsoft\Office\16.0\Outlook\Resiliency\DoNotDisableAddinList" valueName="Rapporter un Spam à ABUSE">
+      <parentCategory ref="CAT_BoutonSpam" />
+      <supportedOn ref="windows:SUPPORTED_Windows7" />
+      <enabledValue><decimal value="1" /></enabledValue>
+      <disabledValue><decimal value="0" /></disabledValue>
+    </policy>
+  </policies>
+</policyDefinitions>

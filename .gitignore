@@ -1,0 +1,67 @@
+# --- Visual Studio / build ---
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+[Dd]ebug/
+[Rr]elease/
+*.msi
+.DS_Store
+publish/
+Backup/
+UpgradeLog*.htm
+_UpgradeReport_Files/
+
+# Certificats / clés privées & secrets — ne JAMAIS versionner
+*.pfx
+*.p12
+*.snk
+*.pvk
+*.key
+*attachments.desc*
+
+# Rapports d'inventaire du poste (générés par 01_verification-poste.ps1 ;
+# contenu propre à chaque poste). Ancre racine pour ne masquer que ce dossier.
+/reports/
+inventaire-poste-*.txt
+
+# Archives de migration générées par 00_make-archive.sh
+archives/*
+!archives/README.md
+*.zip
+
+# Installateurs embarqués pour le poste hors ligne (binaires volumineux)
+installers/*
+!installers/README.md
+
+# Layout Visual Studio (plusieurs Go) — présent localement pour la copie
+# hors ligne (installers/vslayout), jamais versionné (00_make-archive.sh
+# l'inclut dans l'archive de migration ; --sans-layout pour l'exclure).
+VSlayout/
+vslayout/
+installers/VSlayout/
+installers/vslayout/
+installers/vslayout-partiel-*/
+vslayout-partiel-*/
+installers/vs_community.exe
+
+# Journaux d'exécution des scripts (par poste) — garder seulement le README
+logs/*
+!logs/README.md
+
+# Outillage récupéré automatiquement par les scripts (binaires, ne pas committer)
+tools/signtool/
+tools/python/
+
+# Dossier release/ à la RACINE : instantané d'installation (MSI signé + .reg +
+# vstor_redist.exe + notice), régénéré par scripts/04_build.ps1 à chaque build.
+/release/
+
+# Complément web (webaddin) : configs GÉNÉRÉES par apply-config.sh + valeurs
+# de site à remplir (seul deploy.env.example est suivi).
+webaddin/deploy/out/
+webaddin/deploy/deploy.env
+
+# Copie de travail du branding (peut contenir l'empreinte du certificat)
+/branding.conf

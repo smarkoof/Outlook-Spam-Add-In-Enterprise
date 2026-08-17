@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0">
+  <displayName>Bouton de signalement de spam pour Outlook</displayName>
+  <description>Configuration centralisée de l'add-in de signalement de spam/phishing.</description>
+  <resources>
+    <stringTable>
+      <string id="CAT_BoutonSpam">Bouton de signalement de spam (Outlook)</string>
+      <string id="POL_Config">Configuration du signalement</string>
+      <string id="POL_Config_Help">Définit la configuration de l'add-in de signalement sur le poste (clé HKLM\SOFTWARE\OutlookSpamAddin, lue par l'add-in au démarrage d'Outlook).
+
+- Adresse destinataire (To) : boîte qui reçoit les signalements (ex. abuse@mondomaine[.]fr). Si votre chaîne d'analyse relève une boîte dédiée, indiquer cette boîte.
+- Adresse en copie (Cc) : boîte secondaire, vide pour aucune.
+- Regex interne : motif reconnaissant les expéditeurs internes, pour avertir avant de signaler un e-mail de collègue. Attention : dans le registre, les points s'écrivent \. (le backslash est déjà dans le motif).
+- Nombre maximal de destinataires : au-delà, l'e-mail n'est pas transféré (protection des données). 1000 recommandé.
+- Filtrer les messages internes : demander confirmation avant de signaler un e-mail interne (recommandé).
+- Accusé de réception : envoyer automatiquement un e-mail de confirmation à l'utilisateur qui signale (recommandé).
+
+Remarque : ces valeurs s'écrivent dans la clé applicative (hors branche Policies) ; elles subsistent si la GPO est déliée.</string>
+      <string id="POL_NoDisable">Empêcher Outlook de désactiver l'add-in</string>
+      <string id="POL_NoDisable_Help">Outlook désactive de lui-même les compléments qu'il juge lents au démarrage. Cette stratégie (par utilisateur) inscrit l'add-in dans la liste DoNotDisableAddinList d'Outlook pour l'en empêcher.
+
+Le nom de la valeur correspond au PRODUCT_NAME de l'add-in : il est synchronisé automatiquement par scripts/02_customize.sh — redéployer ce modèle ADMX après un changement de nom du produit.</string>
+    </stringTable>
+    <presentationTable>
+      <presentation id="POL_Config">
+        <textBox refId="TXT_To"><label>Adresse destinataire des signalements (To) :</label><defaultValue>abuse@mondomaine[.]fr</defaultValue></textBox>
+        <textBox refId="TXT_Cc"><label>Adresse en copie (Cc), vide = aucune :</label><defaultValue></defaultValue></textBox>
+        <textBox refId="TXT_Regex"><label>Regex des expéditeurs internes :</label><defaultValue>(@mondomaine\.fr$|@.*\.mondomaine\.fr$)</defaultValue></textBox>
+        <decimalTextBox refId="DEC_Max" defaultValue="1000">Nombre maximal de destinataires :</decimalTextBox>
+        <checkBox refId="BOOL_Filter" defaultChecked="true">Avertir avant de signaler un e-mail interne</checkBox>
+        <checkBox refId="BOOL_Ack" defaultChecked="true">Envoyer un accusé de réception à l'utilisateur qui signale</checkBox>
+      </presentation>
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

@@ -1,0 +1,12 @@
+{
+  "_commentaire": "Configuration du BoutonSPAM WEB, servie en HTTPS depuis l'hote interne (src/config.json). Equivalent des cles registre HKLM du VSTO. FAIL-CLOSE : si ce fichier est injoignable ou si abuseTo est vide, le bouton REFUSE d'envoyer et l'affiche a l'utilisateur.",
+  "abuseTo": "",
+  "abuseCc": "",
+  "reportSubjectPrefix": "[SPAM]",
+  "includeTechnicalReport": true,
+  "attachEml": true,
+  "ackToUser": true,
+  "ackSubject": "Merci pour votre signalement",
+  "ackBody": "Votre signalement a bien été transmis à l'équipe sécurité. Merci de votre vigilance.",
+  "_abuseTo_aide": "OBLIGATOIRE — l'adresse de la boite abuse (ex. abuse@votre-domaine.example). Laisser vide = bouton volontairement inoperant (fail-close), aucun envoi vers une adresse par defaut."
+}

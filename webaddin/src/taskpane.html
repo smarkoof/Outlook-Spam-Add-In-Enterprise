@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--
+  taskpane.html — volet de repli (FormSettings) pour les clients trop anciens
+  qui n'affichent pas de bouton de ruban. En pratique jamais atteint en OWA
+  moderne ; fournit un bouton unique et le meme flux.
+-->
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rapporter un Spam à Abuse</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+  <script src="./analyse.js"></script>
+  <script src="./commands.js"></script>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 16px; color: #201f1e; }
+    h1 { font-size: 15px; }
+    button { background: #0b57c8; color: #fff; border: 0; border-radius: 4px;
+             padding: 10px 16px; font-size: 14px; cursor: pointer; }
+    #msg { margin-top: 12px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>Rapporter un Spam à Abuse</h1>
+  <p>Envoie ce message à l'équipe sécurité avec l'analyse technique et l'original joint (.eml).</p>
+  <button id="go">Signaler ce message</button>
+  <div id="msg"></div>
+  <script src="./taskpane.js"></script>
+</body>
+</html>

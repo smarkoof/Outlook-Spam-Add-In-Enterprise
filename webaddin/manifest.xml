@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  BoutonSPAM WEB — complement Outlook web (OWA) / nouveau Outlook, volet HYBRIDE.
+  Compatible Exchange Server on-prem (2016 / 2019 / SE) : jeu d'API Mailbox 1.5
+  (maximum on-prem). Aucune API >= 1.6 utilisee ; lecture des en-tetes + du .eml
+  et envoi vers la boite abuse via EWS (makeEwsRequestAsync, present des 1.1).
+
+  A PERSONNALISER avant deploiement (chercher "A-REMPLACER") :
+    - ProviderName, Id (GUID a generer une fois pour toutes)
+    - AppDomains + toutes les URL https://addin.interne.example -> votre hote HTTPS interne
+  Deploiement : New-App -OrganizationApp (Exchange Management Shell) ou EAC >
+    Organisation > Compléments. Voir README-DEPLOIEMENT.
+-->
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+  xsi:type="MailApp">
+
+  <!-- A-REMPLACER : generer un GUID stable (ex. PowerShell [guid]::NewGuid()) -->
+  <Id>11111111-2222-3333-4444-555555555555</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>MonOrganisationSSI</ProviderName>
+  <DefaultLocale>fr-FR</DefaultLocale>
+  <DisplayName DefaultValue="Rapporter un Spam à Abuse"/>
+  <Description DefaultValue="Signale le message sélectionné à l'équipe sécurité (abuse), avec analyse technique (SPF/DKIM/DMARC) et message d'origine joint en .eml. Équivalent web du bouton du client lourd."/>
+  <IconUrl DefaultValue="https://addin.interne.example/assets/icone-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://addin.interne.example/assets/icone-128.png"/>
+  <SupportUrl DefaultValue="https://addin.interne.example/support"/>
+
+  <!-- A-REMPLACER : le domaine de votre hote HTTPS interne -->
+  <AppDomains>
+    <AppDomain>https://addin.interne.example</AppDomain>
+  </AppDomains>
+
+  <Hosts>
+    <Host Name="Mailbox"/>
+  </Hosts>
+
+  <!-- Socle minimal : 1.1 garantit makeEwsRequestAsync (EWS) sur tout Exchange on-prem -->
+  <Requirements>
+    <Sets>
+      <Set Name="Mailbox" MinVersion="1.1"/>
+    </Sets>
+  </Requirements>
+
+  <!-- Repli pour clients tres anciens : ouverture d'un volet (jamais atteint en pratique) -->
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="https://addin.interne.example/src/taskpane.html"/>
+        <RequestedHeight>250</RequestedHeight>
+      </DesktopSettings>
+    </Form>
+  </FormSettings>
+
+  <Permissions>ReadWriteMailbox</Permissions>
+
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
+  </Rule>
+
+  <DisableEntityHighlighting>false</DisableEntityHighlighting>
+
+  <!-- ================== VersionOverrides : le bouton du ruban ================== -->
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Requirements>
+      <bt:Sets DefaultMinVersion="1.5">
+        <bt:Set Name="Mailbox"/>
+      </bt:Sets>
+    </Requirements>
+
+    <Hosts>
+      <Host xsi:type="MailHost">
+        <DesktopFormFactor>
+
+          <!-- Bouton "no-UI" : execute une fonction (pas de volet) sur pression -->
+          <FunctionFile resid="functionFile"/>
+
+          <!-- Ruban du message ouvert en LECTURE -->
+          <ExtensionPoint xsi:type="MessageReadCommandSurface">
+            <OfficeTab id="TabDefault">
+              <Group id="grpSpam">
+                <Label resid="grpSpam.label"/>
+                <Control xsi:type="Button" id="btnSpamRead">
+                  <Label resid="btnSpam.label"/>
+                  <Supertip>
+                    <Title resid="btnSpam.label"/>
+                    <Description resid="btnSpam.tip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="icon16"/>
+                    <bt:Image size="25" resid="icon25"/>
+                    <bt:Image size="32" resid="icon32"/>
+                    <bt:Image size="48" resid="icon48"/>
+                    <bt:Image size="64" resid="icon64"/>
+                    <bt:Image size="80" resid="icon80"/>
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>signalerSpam</FunctionName>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+
+    <Resources>
+      <bt:Images>
+        <!-- A-REMPLACER : le domaine de votre hote HTTPS interne -->
+        <bt:Image id="icon16" DefaultValue="https://addin.interne.example/assets/icone-16.png"/>
+        <bt:Image id="icon25" DefaultValue="https://addin.interne.example/assets/icone-25.png"/>
+        <bt:Image id="icon32" DefaultValue="https://addin.interne.example/assets/icone-32.png"/>
+        <bt:Image id="icon48" DefaultValue="https://addin.interne.example/assets/icone-48.png"/>
+        <bt:Image id="icon64" DefaultValue="https://addin.interne.example/assets/icone-64.png"/>
+        <bt:Image id="icon80" DefaultValue="https://addin.interne.example/assets/icone-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="functionFile" DefaultValue="https://addin.interne.example/src/commands.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="grpSpam.label" DefaultValue="MonOrganisationSSI"/>
+        <bt:String id="btnSpam.label" DefaultValue="Rapporter un Spam à Abuse"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="btnSpam.tip" DefaultValue="Envoie ce message à l'équipe sécurité (abuse) avec l'analyse technique (SPF/DKIM/DMARC) et l'original joint en .eml."/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

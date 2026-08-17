@@ -1,0 +1,15 @@
+Windows Registry Editor Version 5.00
+
+; ATTENTION : To/Cc ci-dessous = valeurs d'EXEMPLE volontairement INOPERANTES
+; (notation defangee [.]) -> l'add-in BLOQUE l'envoi (fail-close) tant qu'elles ne
+; sont pas remplacees par VOS adresses, SANS crochets.
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\OutlookSpamAddin]
+"To"="abuse@mondomaine[.]fr"
+"Cc"="spam@mondomaine[.]fr"
+"FilterInternalMessages"=dword:00000001
+"Regex"="(@mondomaine\\.fr$|@.*\\.mondomaine\\.fr$)"
+"MaxNumberOfRecipients"=dword:000003e8
+"SendAcknowledgment"=dword:00000001
+"IncludeTechnicalReport"=dword:00000001
+"HashAttachments"=dword:00000001

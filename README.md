@@ -146,7 +146,7 @@ per-version summary lives in `CHANGELOG.md`.
 ## Customisation
 
 Every field to adapt to your organisation (both variants) is catalogued in
-[`CUSTOMIZATION.md`](CUSTOMIZATION.md) ([français](PERSONNALISATION.md)).
+[`CUSTOMIZATION.md`](CUSTOMIZATION.md) ([français](CUSTOMIZATION.fr.md)).
 
 ## License
 

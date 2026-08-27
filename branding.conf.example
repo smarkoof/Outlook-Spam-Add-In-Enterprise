@@ -1,7 +1,7 @@
 # ============================================================================
 #  branding.conf — SOURCE UNIQUE de personnalisation de la solution.
 #  Éditez les valeurs entre "guillemets", puis lancez :  ./scripts/02_customize.sh
-#  (idempotent). Guide détaillé : PERSONNALISATION.md / CUSTOMIZATION.md
+#  (idempotent). Guide détaillé : CUSTOMIZATION.fr.md / CUSTOMIZATION.md
 #  Valeurs livrées GÉNÉRIQUES et volontairement INOPÉRANTES (adresses
 #  défangées [.]) : remplacez-les par celles de VOTRE organisation.
 #  Règles : pas de guillemets " ni de chevrons < > dans les valeurs.
@@ -52,7 +52,7 @@ REPORT_TO="abuse@mondomaine[.]fr"
 REPORT_CC="spam@mondomaine[.]fr"
 
 # Regex reconnaissant vos expéditeurs INTERNES (avertissement avant signalement).
-# Mode d'emploi et exemples : PERSONNALISATION.md, section « Écrire REGEX_INTERNAL ».
+# Mode d'emploi et exemples : CUSTOMIZATION.fr.md, section « Écrire REGEX_INTERNAL ».
 REGEX_INTERNAL="(@mondomaine\.fr$|@.*\.mondomaine\.fr$)"
 
 # ---- Textes utilisateur (FR + EN ; valeur vide "" = texte actuel conservé) --
@@ -88,7 +88,7 @@ UI_ACK_SUBJECT_FR="Votre signalement a bien été transmis à MonOrganisationSSI
 UI_ACK_SUBJECT_EN="Your report has been received"
 
 # Corps de l'accusé : surcharge OPTIONNELLE en texte simple. Vide "" = corps
-# HTML mis en forme de Config.vb conservé (constantes ackBody*, cf. PERSONNALISATION.md).
+# HTML mis en forme de Config.vb conservé (constantes ackBody*, cf. CUSTOMIZATION.fr.md).
 UI_ACK_BODY_FR=""
 UI_ACK_BODY_EN=""
 # (plusieurs signalements — garder le {0} = nombre de messages)

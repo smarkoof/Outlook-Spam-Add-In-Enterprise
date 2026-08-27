@@ -1,4 +1,4 @@
-> **FR :** [Version française](PERSONNALISATION.md)
+> **FR :** [Version française](CUSTOMIZATION.fr.md)
 
 # BoutonSPAM — Enterprise customisation sheet
 

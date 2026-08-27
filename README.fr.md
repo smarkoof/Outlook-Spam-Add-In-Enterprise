@@ -47,7 +47,7 @@ Sous Windows, **PowerShell à la racine du projet, Visual Studio fermé** :
 	# 1. Creer votre copie de configuration (jamais editer les .example)
 	cp branding.conf.example branding.conf
 
-	# 2. Personnaliser : adresses, textes, identite (voir PERSONNALISATION.md)
+	# 2. Personnaliser : adresses, textes, identite (voir CUSTOMIZATION.fr.md)
 
 	# 3. Assistant interactif de bout en bout : poste, branding, certificat, MSI signe
 	Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
@@ -145,7 +145,7 @@ archives — synthèse par version dans `CHANGELOG.fr.md`.
 ## Personnalisation
 
 Chaque champ à adapter à votre organisation (les deux déclinaisons) est
-répertorié dans [`PERSONNALISATION.md`](PERSONNALISATION.md)
+répertorié dans [`CUSTOMIZATION.fr.md`](CUSTOMIZATION.fr.md)
 ([English](CUSTOMIZATION.md)).
 
 ## Licence

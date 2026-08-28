@@ -22,12 +22,13 @@ PROJDIR="$(dirname "$VBPROJ")"
 ASMINFO="$PROJDIR/My Project/AssemblyInfo.vb"
 CONFIGVB="$PROJDIR/Config.vb"
 RIBBONVB="$PROJDIR/Ribbon.vb"
+RIBBONXML="$PROJDIR/Ribbon.xml"
 THISADDIN="$PROJDIR/ThisAddIn.vb"
 VDPROJ="$(ls setup/*.vdproj 2>/dev/null | head -1)"
 REGCONF="resources/RegistryConfig.reg"
 REGNODIS="$(ls resources/DoNotDisableAddinList*.reg 2>/dev/null | head -1)"
 
-for f in "$VBPROJ" "$ASMINFO" "$CONFIGVB" "$RIBBONVB" "$THISADDIN" "$VDPROJ" "$REGCONF" "$REGNODIS"; do
+for f in "$VBPROJ" "$ASMINFO" "$CONFIGVB" "$RIBBONVB" "$RIBBONXML" "$THISADDIN" "$VDPROJ" "$REGCONF" "$REGNODIS"; do
   [ -f "$f" ] || { echo "ERREUR: fichier manquant -> $f"; exit 1; }
 done
 
@@ -211,6 +212,33 @@ vb_text ackBodyOneFR             "${UI_ACK_BODY_FR:-}"
 vb_text ackBodyOneEN             "${UI_ACK_BODY_EN:-}"
 vb_text ackBodyMoreFR            "${UI_ACK_BODY_MORE_FR:-}"
 vb_text ackBodyMoreEN            "${UI_ACK_BODY_MORE_EN:-}"
+
+echo ">> Icône du bouton (ruban + menus contextuels)"
+# Icône fournie par Office (imageMso) : aucune image n'est embarquée, aucun
+# fichier à déployer, et le rendu suit le thème d'Outlook. La liste blanche
+# ci-dessous est un garde-fou VOLONTAIRE : un imageMso inconnu n'échoue PAS à
+# l'exécution, le bouton s'afficherait simplement sans icône — un défaut
+# silencieux qu'on refuse d'expédier en parc.
+if [ -n "${BUTTON_ICON:-}" ]; then
+  case "$BUTTON_ICON" in
+    PermissionRestrict|Risks|SourceControlRun|FilePermissionView|CancelRequest) : ;;
+    *)
+      echo "ERREUR: BUTTON_ICON invalide (valeur lue : $BUTTON_ICON)."
+      echo "        Valeurs acceptées : PermissionRestrict (défaut), Risks,"
+      echo "        SourceControlRun, FilePermissionView, CancelRequest."
+      echo "        Un identifiant inconnu ne ferait pas échouer Outlook : le bouton"
+      echo "        s'afficherait SANS icône. D'où ce refus ici, avant le build."
+      exit 1
+      ;;
+  esac
+  # Les 5 occurrences de Ribbon.xml sont alignées (ruban, menus contextuels, et
+  # les blocs actuellement en commentaire) : décommenter un bloc plus tard donne
+  # ainsi la même icône partout, sans retouche manuelle.
+  VAL="$BUTTON_ICON" perl -pi -e 's{(imageMso=")[^"]*(")}{"$1".$ENV{VAL}."$2"}ge' "$RIBBONXML"
+  echo "   imageMso <- $BUTTON_ICON"
+else
+  echo "   (BUTTON_ICON vide — icône actuelle conservée)"
+fi
 
 ADMX="deploy/ADMX/BoutonSpam.admx"
 if [ -f "$ADMX" ]; then

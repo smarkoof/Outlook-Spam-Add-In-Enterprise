@@ -36,6 +36,7 @@ version bump and the MSI build.
 | `UI_GROUP_FR` / `_EN` | Ribbon group name |
 | `UI_BUTTON_TIP_FR` / `_EN` | Short hover description |
 | `UI_BUTTON_SUPERTIP_FR` / `_EN` | Large help tooltip |
+| `BUTTON_ICON` | Button icon (ribbon **and** context menus) — an icon provided by Office (`imageMso`): `PermissionRestrict` (default), `Risks`, `SourceControlRun`, `FilePermissionView`, `CancelRequest`. Nothing to ship, follows the Outlook theme. Any other value is rejected by `02_customize.sh` |
 | `UI_CONFIRM_TITLE_FR` / `_EN` | Confirmation dialog title |
 | `UI_REPORT_BODY_FR` / `_EN` | Report introduction sentence (seen by your analysts) |
 | `UI_ACK_SUBJECT_FR` / `_EN` | Subject of the automatic acknowledgment |

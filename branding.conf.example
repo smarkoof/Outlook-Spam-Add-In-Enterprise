@@ -99,6 +99,24 @@ UI_ACK_BODY_MORE_EN=""
 REPORT_SUBJECT_PREFIX="[SPAM]"
 REPORT_SUBJECT_PREFIX_ERROR="[SPAM-ERREUR]"
 
+# ---- Icône du bouton -------------------------------------------------------
+
+# Icône du bouton du ruban ET des menus contextuels. Ce sont des icônes
+# FOURNIES PAR OFFICE (imageMso) : rien à livrer ni à compiler, et elles
+# suivent automatiquement le thème d'Outlook (clair/sombre) ainsi que la
+# taille demandée (16 ou 32 px).
+#   PermissionRestrict   (défaut — icône actuelle)
+#   Risks
+#   SourceControlRun
+#   FilePermissionView
+#   CancelRequest
+# Aperçu (nom ↔ image) de toutes les icônes Office :
+#   https://codekabinett.com/rdumps.php?Lang=2&targetDoc=office-imagemso-gallery-ribbon-icons
+# Toute autre valeur est REFUSÉE par 02_customize.sh : un identifiant inconnu
+# n'échoue pas à l'exécution, le bouton s'afficherait simplement SANS icône.
+# Vide "" = icône actuelle conservée.
+BUTTON_ICON="PermissionRestrict"
+
 # ---- Signature de code -----------------------------------------------------
 
 # Empreinte du certificat (magasin Windows) ; vide = repli automatique de 03_sign.ps1.

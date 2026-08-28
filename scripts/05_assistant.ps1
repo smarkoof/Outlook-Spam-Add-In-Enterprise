@@ -444,6 +444,10 @@ if (Ask-YesNo "Modifier les TEXTES affiches (bouton, dialogues, accuse de recept
   Edit-Field "UI_BUTTON_TIP_EN"      "Info-bulle courte (EN)"            ""
   Edit-Field "UI_BUTTON_SUPERTIP_FR" "Info-bulle detaillee (FR)"         "1 a 2 phrases d'aide"
   Edit-Field "UI_BUTTON_SUPERTIP_EN" "Info-bulle detaillee (EN)"         ""
+  Note  "    Icone du bouton : icones fournies par Office (rien a livrer, suit le theme clair/sombre)."
+  Note  "    Valeurs possibles : PermissionRestrict (defaut) | Risks | SourceControlRun |"
+  Note  "                        FilePermissionView | CancelRequest"
+  Edit-Field "BUTTON_ICON"           "Icone du bouton"                   "une des 5 valeurs ci-dessus ; toute autre est refusee par 02_customize.sh"
   Write-Host ""
   Write-Host "  -- Dialogues & rapport --" -ForegroundColor White
   Edit-Field "UI_CONFIRM_TITLE_FR"   "Titre de la confirmation (FR)"     "boite affichee avant l'envoi"

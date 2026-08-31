@@ -16,6 +16,9 @@ Historique concis. Les versions suivent le schéma à 4 segments de l'add-in
 - Préparation de poste neuf : `01_verification-poste.ps1 -Setup/-Install`
   (inventaire, prérequis, Visual Studio, layout hors-ligne, règle de la
   racine courte).
+- Identité MSI automatisée : `UPGRADE_CODE` épinglé dans `branding.conf`,
+  ProductCode régénéré à chaque montée de version (mises à niveau majeures
+  Windows propres) — guide de mise à jour dans `UPGRADE.fr.md`.
 
 ## v1.6.0.0 — remédiation complète de l'audit (produit + chaîne d'outils)
 ## v1.5.1 — remédiation de l'audit de suivi (chaîne d'outils)

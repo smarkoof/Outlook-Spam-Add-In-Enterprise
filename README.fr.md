@@ -115,6 +115,9 @@ Le dossier `deploy/` fournit le modèle **GPO ADMX/ADML** (configuration
 centralisée + anti-désactivation) et `install-silencieux.cmd` (MSI + registre,
 utilisable tel quel avec SCCM/MECM, Intune ou votre outil de parc).
 
+Mise à jour d'un parc qui exécute déjà BoutonSPAM : voir
+[`UPGRADE.fr.md`](UPGRADE.fr.md) — quoi préserver, identité MSI, contrôles pilote.
+
 ## Complément web (OWA / nouveau Outlook)
 
 Le dossier `webaddin/` contient le manifeste, les sources et un générateur

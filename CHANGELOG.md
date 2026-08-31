@@ -15,6 +15,9 @@ Concise version history. Versions follow the add-in's 4-segment scheme
   refuse them: fail-close by design).
 - New-workstation bootstrap: `01_verification-poste.ps1 -Setup/-Install`
   (inventory, prerequisites, Visual Studio, offline layout, short-root rule).
+- Automated MSI identity: `UPGRADE_CODE` pinned in `branding.conf`, ProductCode
+  regenerated on every version increase (clean Windows major upgrades) —
+  upgrade guide in `UPGRADE.md`.
 
 ## v1.6.0.0 — full remediation of audit findings (product + toolchain)
 ## v1.5.1 — follow-up audit remediation (toolchain)

@@ -127,5 +127,23 @@ TIMESTAMP_URL="http://timestamp.digicert.com"
 
 # ---- Identité MSI (GUID) ---------------------------------------------------
 
-# 1 = régénérer les GUID, UNE seule fois lors d'un rebranding complet ; sinon 0.
+# Identité de FAMILLE du produit (UpgradeCode) : posée UNE fois, elle ne change
+# JAMAIS ensuite — c'est elle qui permet à une nouvelle version de REMPLACER la
+# précédente sur les postes. Renseignée, elle est réécrite dans le projet
+# d'installation à chaque exécution : votre identité survit ainsi aux mises à
+# jour du dépôt (chaque release fournit son propre setup/Setup.vdproj).
+# Vide "" = l'UpgradeCode actuel du projet est conservé tel quel.
+# Accolades facultatives : XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+UPGRADE_CODE=""
+
+# Le ProductCode identifie UNE version précise : il est régénéré AUTOMATIQUEMENT
+# à chaque montée de VERSION (mise à niveau majeure Windows — sans cela msiexec
+# échoue avec l'erreur 1638). 1 = forcer une régénération immédiate sans montée
+# de version ; sinon 0.
+REGEN_PRODUCTCODE=0
+
+# 1 = régénérer TOUTE l'identité (UpgradeCode compris), UNE seule fois lors de
+# l'adoption initiale ou d'un rebranding complet ; sinon 0. Incompatible avec
+# UPGRADE_CODE renseigné. Reportez ensuite l'UpgradeCode affiché dans
+# UPGRADE_CODE ci-dessus, et remettez 0.
 REGEN_GUIDS=0

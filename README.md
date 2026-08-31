@@ -115,6 +115,9 @@ The `deploy/` folder ships the **ADMX/ADML GPO template** (central
 configuration + anti-disabling) and `install-silencieux.cmd` (MSI + registry,
 usable as-is with SCCM/MECM, Intune or your fleet tool).
 
+Upgrading a fleet that already runs BoutonSPAM: see [`UPGRADE.md`](UPGRADE.md)
+([français](UPGRADE.fr.md)) — what to preserve, MSI identity, pilot checks.
+
 ## Web add-in (OWA / new Outlook)
 
 The `webaddin/` folder contains the manifest, the sources and a

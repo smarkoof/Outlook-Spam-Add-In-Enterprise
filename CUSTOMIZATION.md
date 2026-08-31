@@ -43,7 +43,9 @@ version bump and the MSI build.
 | `UI_ACK_BODY_FR/_EN`, `UI_ACK_BODY_MORE_FR/_EN` | **Plain-text** override of the acknowledgment body (`""` = keep the HTML version from `Config.vb`) |
 | `REPORT_SUBJECT_PREFIX`, `REPORT_SUBJECT_PREFIX_ERROR` | Subject prefixes `[SPAM]` / `[SPAM-ERREUR]` (abuse mailbox sorting rules) |
 | `CERT_THUMBPRINT`, `TIMESTAMP_URL` | Code signing (certificate thumbprint, RFC 3161 timestamping) |
-| `REGEN_GUIDS` | `1` once during a full rebranding, otherwise `0` |
+| `UPGRADE_CODE` | Product FAMILY identity (GUID) — set once, never changed; re-applied to the installer project at every run, so it survives repository updates |
+| `REGEN_PRODUCTCODE` | The ProductCode is regenerated automatically on every version increase (Windows major upgrade); `1` forces one without a version change |
+| `REGEN_GUIDS` | `1` once at initial adoption or full rebranding — regenerates the WHOLE identity, UpgradeCode included; then report it into `UPGRADE_CODE` and set back to `0` |
 
 Writing rules (recap of the file header): no double quotes `"` nor angle
 brackets `< >` in values, no line breaks; addresses **without** brackets —

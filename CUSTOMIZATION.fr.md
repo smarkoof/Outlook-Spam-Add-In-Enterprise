@@ -42,7 +42,9 @@ qui gère aussi l'incrément de version et le build du MSI.
 | `UI_ACK_BODY_FR/_EN`, `UI_ACK_BODY_MORE_FR/_EN` | Surcharge **texte simple** du corps de l'accusé (`""` = version HTML de `Config.vb` conservée) |
 | `REPORT_SUBJECT_PREFIX`, `REPORT_SUBJECT_PREFIX_ERROR` | Préfixes d'objet `[SPAM]` / `[SPAM-ERREUR]` (règles de tri de la boîte abuse) |
 | `CERT_THUMBPRINT`, `TIMESTAMP_URL` | Signature de code (empreinte du certificat, horodatage RFC 3161) |
-| `REGEN_GUIDS` | `1` une seule fois lors d'un rebranding complet, sinon `0` |
+| `UPGRADE_CODE` | Identité de FAMILLE du produit (GUID) — posée une fois, jamais changée ; réappliquée au projet d'installation à chaque exécution, elle survit aux mises à jour du dépôt |
+| `REGEN_PRODUCTCODE` | Le ProductCode est régénéré automatiquement à chaque montée de version (mise à niveau majeure Windows) ; `1` en force une sans montée de version |
+| `REGEN_GUIDS` | `1` une seule fois à l'adoption initiale ou lors d'un rebranding complet — régénère TOUTE l'identité, UpgradeCode compris ; reportez-le ensuite dans `UPGRADE_CODE` et remettez `0` |
 
 Règles d'écriture (rappel de l'en-tête du fichier) : pas de guillemets doubles
 `"` ni de chevrons `< >` dans les valeurs, pas de retour à la ligne ; adresses

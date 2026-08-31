@@ -86,6 +86,52 @@ if [ -n "$CUR_VER" ] && [ "$CUR_VER" != "$VERSION" ] && [ "$(ver_lt "$VERSION" "
   echo ">> Montée de version : $CUR_VER -> $VERSION"
 fi
 
+# --- Fabriques de GUID (partagées) -------------------------------------------
+# Un GUID valide, quel que soit l'outil dispo. ATTENTION Windows/Git Bash :
+# 'python'/'python3' peuvent être de FAUX alias du Microsoft Store qui ne
+# renvoient RIEN -> chaque candidat est VALIDÉ avant d'être accepté.
+# Ordre : uuidgen -> Python EMBARQUÉ du projet (tools/python) -> PowerShell
+# -> python3 système -> repli pur perl (toujours présent dans Git Bash).
+is_guid () { printf '%s' "$1" | grep -qiE '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; }
+gen () {
+  local g=""
+  if command -v uuidgen >/dev/null 2>&1; then g="$(uuidgen 2>/dev/null | tr -d '\r' || true)"; fi
+  if ! is_guid "$g" && [ -x "tools/python/python.exe" ]; then
+    g="$(tools/python/python.exe -c 'import uuid;print(uuid.uuid4())' 2>/dev/null | tr -d '\r' || true)"
+  fi
+  if ! is_guid "$g" && command -v powershell.exe >/dev/null 2>&1; then
+    g="$(powershell.exe -NoProfile -Command '[guid]::NewGuid().ToString()' 2>/dev/null | tr -d '\r' || true)"
+  fi
+  if ! is_guid "$g" && command -v python3 >/dev/null 2>&1; then
+    g="$(python3 -c 'import uuid;print(uuid.uuid4())' 2>/dev/null | tr -d '\r' || true)"
+  fi
+  if ! is_guid "$g"; then
+    g="$(perl -e 'my @r = map { int(rand(65536)) } 1..8; $r[3] = ($r[3] & 0x0fff) | 0x4000; $r[4] = ($r[4] & 0x3fff) | 0x8000; printf "%04x%04x-%04x-%04x-%04x-%04x%04x%04x\n", @r')"
+  fi
+  is_guid "$g" || { echo "ERREUR: impossible de générer un GUID."; exit 1; }
+  printf '%s\n' "$g"
+}
+up () { gen | tr 'a-f' 'A-F'; }   # majuscules (format vdproj)
+lo () { gen | tr 'A-F' 'a-f'; }   # minuscules (format attribut COM)
+
+# --- GARDE-FOU IDENTITÉ MSI : tout valider AVANT d'écrire quoi que ce soit ---
+if [ -n "${UPGRADE_CODE:-}" ] && [ "${REGEN_GUIDS:-0}" = "1" ]; then
+  echo "ERREUR: REGEN_GUIDS=1 et UPGRADE_CODE renseigné sont contradictoires."
+  echo "        REGEN_GUIDS régénère l'identité COMPLÈTE, UpgradeCode compris :"
+  echo "        videz UPGRADE_CODE pour changer de famille de produit, ou gardez"
+  echo "        REGEN_GUIDS=0 pour conserver la famille épinglée."
+  exit 1
+fi
+UC=""
+if [ -n "${UPGRADE_CODE:-}" ]; then
+  UC="$(printf '%s' "$UPGRADE_CODE" | tr -d '{} ' | tr 'a-f' 'A-F')"
+  if ! is_guid "$UC"; then
+    echo "ERREUR: UPGRADE_CODE n'est pas un GUID valide (valeur lue : $UPGRADE_CODE)."
+    echo "        Forme attendue : XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX (accolades facultatives)."
+    exit 1
+  fi
+fi
+
 # Nom de base du MSI : générique, sans espace. Défaut = MSI_BASENAME, sinon
 # dérivé de PRODUCT_NAME. Caractères non sûrs (espaces inclus) retirés.
 MSI_BASE="$(printf '%s' "${MSI_BASENAME:-$PRODUCT_NAME}" | tr -cd 'A-Za-z0-9._-')"
@@ -267,34 +313,44 @@ if [ -n "${TIMESTAMP_URL:-}" ]; then
   VAL="$TIMESTAMP_URL" perl -0777 -pi -e 's{<ManifestTimestampUrl>.*?</ManifestTimestampUrl>}{"<ManifestTimestampUrl>".$ENV{VAL}."</ManifestTimestampUrl>"}se' "$VBPROJ"
 fi
 
+echo ">> Identité MSI"
+# UpgradeCode = identité de FAMILLE du produit : épinglé dans branding.conf, il
+# est réécrit dans le projet d'installation À CHAQUE exécution — il survit ainsi
+# aux mises à jour du dépôt (chaque release fournit son propre Setup.vdproj).
+# Sans UpgradeCode stable, une nouvelle version s'installerait À CÔTÉ de
+# l'ancienne au lieu de la remplacer.
+if [ -n "${UPGRADE_CODE:-}" ]; then
+  VAL="{$UC}" perl -pi -e 's#("UpgradeCode" = "8:)\{[^}]*\}(")#"$1".$ENV{VAL}."$2"#e' "$VDPROJ"
+  echo "   UpgradeCode épinglé : {$UC}"
+elif [ "${REGEN_GUIDS:-0}" != "1" ]; then
+  echo "   (conseil : figez UPGRADE_CODE dans branding.conf — votre identité de"
+  echo "    famille survivra ainsi aux mises à jour du dépôt.)"
+fi
+# ProductCode = identité d'UNE version : Windows n'exécute une mise à niveau
+# majeure (ancienne version retirée automatiquement, RemovePreviousVersions)
+# que si le ProductCode CHANGE — sinon msiexec échoue avec l'erreur 1638. Il
+# est donc régénéré à chaque MONTÉE de version, ou sur demande explicite
+# (REGEN_PRODUCTCODE=1). Le PackageCode, propre à chaque .msi fabriqué, suit.
+NEED_PC=0
+[ "${REGEN_PRODUCTCODE:-0}" = "1" ] && NEED_PC=1
+if [ -n "$CUR_VER" ] && [ "$CUR_VER" != "$VERSION" ] && [ "$(ver_lt "$VERSION" "$CUR_VER")" != "1" ]; then
+  NEED_PC=1
+fi
+if [ "${REGEN_GUIDS:-0}" != "1" ]; then
+  if [ "$NEED_PC" = "1" ]; then
+    PC="{$(up)}"; PK="{$(up)}"
+    VAL="$PC" perl -pi -e 's#("ProductCode" = "8:)\{[^}]*\}(")#"$1".$ENV{VAL}."$2"#e' "$VDPROJ"
+    VAL="$PK" perl -pi -e 's#("PackageCode" = "8:)\{[^}]*\}(")#"$1".$ENV{VAL}."$2"#e' "$VDPROJ"
+    echo "   ProductCode régénéré : $PC"
+    echo "   PackageCode régénéré : $PK"
+    echo "   -> mise à niveau majeure : à l'installation, la version précédente sera retirée."
+  else
+    echo "   ProductCode conservé (pas de montée de version)."
+  fi
+fi
+
 if [ "${REGEN_GUIDS:-0}" = "1" ]; then
   echo ">> Régénération des GUID (nouvelle identité produit)"
-  # Un GUID valide, quel que soit l'outil dispo. ATTENTION Windows/Git Bash :
-  # 'python'/'python3' peuvent être de FAUX alias du Microsoft Store qui ne
-  # renvoient RIEN -> chaque candidat est VALIDÉ avant d'être accepté.
-  # Ordre : uuidgen -> Python EMBARQUÉ du projet (tools/python) -> PowerShell
-  # -> python3 système -> repli pur perl (toujours présent dans Git Bash).
-  is_guid () { printf '%s' "$1" | grep -qiE '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; }
-  gen () {
-    local g=""
-    if command -v uuidgen >/dev/null 2>&1; then g="$(uuidgen 2>/dev/null | tr -d '\r' || true)"; fi
-    if ! is_guid "$g" && [ -x "tools/python/python.exe" ]; then
-      g="$(tools/python/python.exe -c 'import uuid;print(uuid.uuid4())' 2>/dev/null | tr -d '\r' || true)"
-    fi
-    if ! is_guid "$g" && command -v powershell.exe >/dev/null 2>&1; then
-      g="$(powershell.exe -NoProfile -Command '[guid]::NewGuid().ToString()' 2>/dev/null | tr -d '\r' || true)"
-    fi
-    if ! is_guid "$g" && command -v python3 >/dev/null 2>&1; then
-      g="$(python3 -c 'import uuid;print(uuid.uuid4())' 2>/dev/null | tr -d '\r' || true)"
-    fi
-    if ! is_guid "$g"; then
-      g="$(perl -e 'my @r = map { int(rand(65536)) } 1..8; $r[3] = ($r[3] & 0x0fff) | 0x4000; $r[4] = ($r[4] & 0x3fff) | 0x8000; printf "%04x%04x-%04x-%04x-%04x-%04x%04x%04x\n", @r')"
-    fi
-    is_guid "$g" || { echo "ERREUR: impossible de générer un GUID."; exit 1; }
-    printf '%s\n' "$g"
-  }
-  up () { gen | tr 'a-f' 'A-F'; }   # majuscules (format vdproj)
-  lo () { gen | tr 'A-F' 'a-f'; }   # minuscules (format attribut COM)
   # délimiteur # pour éviter le conflit avec les accolades des GUID.
   # Les motifs tolèrent une valeur actuelle VIDE ou invalide (réparation).
   G1="{$(up)}"; G2="{$(up)}"; G3="{$(up)}"; G4="$(lo)"
@@ -306,7 +362,9 @@ if [ "${REGEN_GUIDS:-0}" = "1" ]; then
   echo "   PackageCode = $G2"
   echo "   UpgradeCode = $G3"
   echo "   Assembly    = $G4"
-  echo "   RAPPEL : remets REGEN_GUIDS=0 dans branding.conf — l'identité ne se régénère qu'UNE fois."
+  echo "   À FAIRE : reportez l'UpgradeCode ci-dessus dans UPGRADE_CODE de"
+  echo "   branding.conf (il sera réappliqué à chaque exécution et survivra aux"
+  echo "   mises à jour du dépôt), puis remettez REGEN_GUIDS=0."
 fi
 
 echo

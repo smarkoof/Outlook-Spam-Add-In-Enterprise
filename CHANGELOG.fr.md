@@ -16,6 +16,11 @@ Historique concis. Les versions suivent le schéma à 4 segments de l'add-in
 - Préparation de poste neuf : `01_verification-poste.ps1 -Setup/-Install`
   (inventaire, prérequis, Visual Studio, layout hors-ligne, règle de la
   racine courte).
+- Prérequis de **signature contrôlé avant la compilation** : `signtool`
+  manquant est signalé en quelques secondes, et non après tout le build.
+  `tools/` (signtool, python) n'est pas versionné : il se reporte d'un
+  dossier de travail à l'autre, ou s'obtient via `01_verification-poste.ps1`
+  (poste connecté) ou l'archive projet `00_make-archive.sh` (poste isolé).
 - Identité MSI automatisée : `UPGRADE_CODE` épinglé dans `branding.conf`,
   ProductCode régénéré à chaque montée de version (mises à niveau majeures
   Windows propres) — guide de mise à jour dans `UPGRADE.fr.md`.

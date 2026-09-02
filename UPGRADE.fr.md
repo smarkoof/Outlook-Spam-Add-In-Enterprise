@@ -14,7 +14,16 @@ remettre vos fichiers, puis reconstruire votre MSI.
 | `branding.conf` | Toute votre configuration — adresses, textes, version, identité MSI, empreinte de certificat. **Le fichier à ne jamais perdre.** |
 | `certs/` | Votre certificat de signature de code (jamais versionné, par conception) |
 | `installers/` | Binaires hors ligne : runtime VSTO, layout Visual Studio |
+| `tools/` | Outils rendus persistants : `signtool/` (signature) et `python/`. **Jamais versionnés** : un poste hors ligne ne peut pas les re-télécharger. |
 | `webaddin/deploy/deploy.env` | Configuration du complément web, si vous l'utilisez |
+
+> **Obtenir `tools/`** : sur un poste **connecté**,
+> `.\scripts\01_verification-poste.ps1 -CompleteVS` le récupère depuis les
+> sources officielles (paquet NuGet Microsoft pour `signtool`, python.org pour
+> le Python embarqué). Sur un poste **isolé**, il voyage dans l'archive projet
+> produite par `scripts/00_make-archive.sh`. Ces binaires ne sont volontairement
+> pas versionnés : ils ne sont pas redistribuables, et alourdiraient
+> définitivement l'historique du dépôt.
 
 Tout le reste — `setup/Setup.vdproj` compris — vient de la release et revient
 aux valeurs du dépôt à chaque mise à jour. C'est voulu : les valeurs qui
@@ -26,8 +35,8 @@ comptent sont réappliquées depuis `branding.conf` par
 1. **Récupérer la release dans un dossier neuf** (`git clone --branch <tag> …`,
    ou décompresser l'archive de la release à côté du dossier actuel — jamais
    par-dessus).
-2. **Remettre vos fichiers** : `branding.conf`, `certs/`, `installers/`, et
-   `webaddin/deploy/deploy.env` le cas échéant.
+2. **Remettre vos fichiers** : `branding.conf`, `certs/`, `installers/`,
+   `tools/`, et `webaddin/deploy/deploy.env` le cas échéant.
 3. **Monter `VERSION`** dans `branding.conf` — strictement supérieure à celle
    déployée (la chaîne refuse une baisse) — et adopter les nouveaux réglages :
    comparez votre fichier à `branding.conf.example` et lisez les notes de la
@@ -87,3 +96,4 @@ que le parc reconnaît cet émetteur avant de diffuser.
 | Deux entrées / deux boutons | UpgradeCode différent de la production | Épingler votre `UPGRADE_CODE`, reconstruire, désinstaller le doublon |
 | La chaîne refuse la version | `VERSION` inférieure à celle du projet | Une version ne diminue jamais ; `FORCE_VERSION=1` est réservé aux bases vierges |
 | Bouton installé mais refuse d'envoyer | Configuration registre machine absente | Appliquer `resources/RegistryConfig.reg` ou l'ADMX — fail-close par conception |
+| « signtool.exe introuvable » | `tools/` non reporté (il n'est pas versionné) | Recopier `tools/` depuis le dossier précédent, ou `-NoSign` pour construire sans signer |

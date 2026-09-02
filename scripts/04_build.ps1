@@ -99,6 +99,41 @@ if (-not $vsPath) { throw "Visual Studio 2022 introuvable (vswhere + disque). Ve
 $devenv = Join-Path $vsPath "Common7\IDE\devenv.com"
 if (-not (Test-Path $devenv)) { throw ("devenv.com introuvable sous " + $vsPath) }
 
+# --- Prerequis SIGNATURE, controle MAINTENANT et non a l'etape 4/5 ----------
+# La signature est la derniere etape : sans ce controle, un signtool manquant
+# ne se revele qu'APRES toute la compilation. Or tools\ n'est pas suivi par git
+# (binaires persistants) : il ne suit donc pas une simple copie du depot, et un
+# poste hors ligne ne peut rien re-telecharger. On echoue donc en quelques
+# secondes, avec la marche a suivre, plutot qu'apres plusieurs minutes.
+if (-not $NoSign) {
+  $stCheck = $null
+  $stLocal = Join-Path $ROOT "tools\signtool\signtool.exe"
+  if (Test-Path $stLocal) { $stCheck = $stLocal }
+  if (-not $stCheck) {
+    $stCheck = Get-ChildItem (Join-Path $ROOT "tools") -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
+               Select-Object -First 1 -ExpandProperty FullName
+  }
+  if (-not $stCheck) { $stCheck = (Get-Command signtool.exe -ErrorAction SilentlyContinue | Select-Object -First 1).Source }
+  if (-not $stCheck) {
+    $stRoots = @("${env:ProgramFiles(x86)}\Windows Kits\10\bin", "${env:ProgramFiles}\Windows Kits\10\bin") |
+               Where-Object { $_ -and (Test-Path $_) }
+    foreach ($r in $stRoots) {
+      $cand = Get-ChildItem -Path $r -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match '\\x64\\' } |
+              Sort-Object FullName -Descending | Select-Object -First 1
+      if ($cand) { $stCheck = $cand.FullName; break }
+    }
+  }
+  if (-not $stCheck) {
+    throw ("signtool.exe introuvable : le build echouerait a l'etape 4/5, APRES la compilation." + [Environment]::NewLine +
+           "  tools\ n'est pas suivi par git : il ne suit pas une copie du depot." + [Environment]::NewLine +
+           "  - reportez tools\ depuis votre dossier de travail precedent (signtool + python), ou" + [Environment]::NewLine +
+           "  - poste connecte : .\scripts\01_verification-poste.ps1 -CompleteVS, ou" + [Environment]::NewLine +
+           "  - construisez sans signer : .\scripts\04_build.ps1 -NoSign")
+  }
+  Write-Host ("signtool   : " + $stCheck + "   (verifie AVANT la compilation)")
+}
+
 # Prerequis CONNU du build des projets d'installation en ligne de commande :
 # sans ce reglage (une fois par utilisateur), devenv echoue avec HRESULT 8000000A.
 # IMPORTANT : l'outil identifie l'instance VS d'apres le REPERTOIRE COURANT ;

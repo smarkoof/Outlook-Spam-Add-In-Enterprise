@@ -14,7 +14,16 @@ files back, then rebuilding your MSI.
 | `branding.conf` | Your whole configuration — addresses, texts, version, MSI identity, certificate thumbprint. **The one file to never lose.** |
 | `certs/` | Your code-signing certificate (never versioned, by design) |
 | `installers/` | Offline binaries: VSTO runtime, Visual Studio layout |
+| `tools/` | Persistent tooling: `signtool/` (signing) and `python/`. **Never versioned**: an offline machine cannot re-download them. |
 | `webaddin/deploy/deploy.env` | Web add-in configuration, if you use it |
+
+> **Getting `tools/`**: on a **connected** machine,
+> `.\scripts\01_verification-poste.ps1 -CompleteVS` fetches it from official
+> sources (Microsoft NuGet package for `signtool`, python.org for the embedded
+> Python). On an **isolated** machine it travels inside the project archive
+> produced by `scripts/00_make-archive.sh`. These binaries are deliberately not
+> versioned: they are not ours to redistribute, and would permanently weigh
+> down the repository history.
 
 Everything else — including `setup/Setup.vdproj` — comes from the release and
 is reset to repository defaults on every upgrade. That is fine: the values that
@@ -24,8 +33,8 @@ matter are re-applied from `branding.conf` by `scripts/02_customize.sh`.
 
 1. **Fetch the release into a fresh folder** (`git clone --branch <tag> …`, or
    unzip the release archive next to your current folder — never on top of it).
-2. **Put your files back**: `branding.conf`, `certs/`, `installers/`, and
-   `webaddin/deploy/deploy.env` if applicable.
+2. **Put your files back**: `branding.conf`, `certs/`, `installers/`, `tools/`,
+   and `webaddin/deploy/deploy.env` if applicable.
 3. **Raise `VERSION`** in `branding.conf` — it must be strictly higher than the
    deployed one (the toolchain refuses a decrease), and adopt any new settings:
    compare your file with `branding.conf.example` and read the release notes.
@@ -81,3 +90,4 @@ authority, make sure the fleet trusts that issuer before deploying.
 | Two entries / two buttons | UpgradeCode differs from production | Pin your `UPGRADE_CODE`, rebuild, uninstall the duplicate |
 | Toolchain refuses the version | `VERSION` lower than the project's | A version never decreases; `FORCE_VERSION=1` is only for brand-new bases |
 | Button installed but refuses to send | Machine registry configuration missing | Apply `resources/RegistryConfig.reg` or the ADMX — fail-close by design |
+| "signtool.exe not found" | `tools/` not carried over (it is not versioned) | Copy `tools/` from the previous folder, or use `-NoSign` to build unsigned |

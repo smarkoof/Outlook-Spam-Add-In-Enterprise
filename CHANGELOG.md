@@ -15,6 +15,11 @@ Concise version history. Versions follow the add-in's 4-segment scheme
   refuse them: fail-close by design).
 - New-workstation bootstrap: `01_verification-poste.ps1 -Setup/-Install`
   (inventory, prerequisites, Visual Studio, offline layout, short-root rule).
+- Signing prerequisite **checked before compiling**: a missing `signtool` is
+  reported within seconds instead of after the whole build. `tools/`
+  (signtool, python) is not versioned: carry it over between working folders,
+  or obtain it via `01_verification-poste.ps1` (connected machine) or the
+  project archive `00_make-archive.sh` (isolated machine).
 - Automated MSI identity: `UPGRADE_CODE` pinned in `branding.conf`, ProductCode
   regenerated on every version increase (clean Windows major upgrades) —
   upgrade guide in `UPGRADE.md`.

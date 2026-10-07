@@ -90,4 +90,5 @@ authority, make sure the fleet trusts that issuer before deploying.
 | Two entries / two buttons | UpgradeCode differs from production | Pin your `UPGRADE_CODE`, rebuild, uninstall the duplicate |
 | Toolchain refuses the version | `VERSION` lower than the project's | A version never decreases; `FORCE_VERSION=1` is only for brand-new bases |
 | Button installed but refuses to send | Machine registry configuration missing | Apply `resources/RegistryConfig.reg` or the ADMX — fail-close by design |
+| "Build succeeded but …`.dll` not found" | Product renamed with a toolchain ≤ v1.6.3, which expected the original name | Move to v1.6.4: the name is read from the `.vbproj` |
 | "signtool.exe not found" | `tools/` not carried over (it is not versioned) | Copy `tools/` from the previous folder, or use `-NoSign` to build unsigned |

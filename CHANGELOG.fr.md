@@ -16,6 +16,10 @@ Historique concis. Les versions suivent le schéma à 4 segments de l'add-in
 - Préparation de poste neuf : `01_verification-poste.ps1 -Setup/-Install`
   (inventaire, prérequis, Visual Studio, layout hors-ligne, règle de la
   racine courte).
+- **Renommer le produit ne casse plus le build** : `04_build.ps1` lit le nom de
+  l'assembly dans le `.vbproj` (écrit depuis `PRODUCT_NAME`) au lieu de le coder
+  en dur. Construire des variantes — pour comparer plusieurs icônes, par exemple —
+  fonctionne désormais sans retoucher la chaîne.
 - Prérequis de **signature contrôlé avant la compilation** : `signtool`
   manquant est signalé en quelques secondes, et non après tout le build.
   `tools/` (signtool, python) n'est pas versionné : il se reporte d'un

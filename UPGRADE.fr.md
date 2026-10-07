@@ -96,4 +96,5 @@ que le parc reconnaît cet émetteur avant de diffuser.
 | Deux entrées / deux boutons | UpgradeCode différent de la production | Épingler votre `UPGRADE_CODE`, reconstruire, désinstaller le doublon |
 | La chaîne refuse la version | `VERSION` inférieure à celle du projet | Une version ne diminue jamais ; `FORCE_VERSION=1` est réservé aux bases vierges |
 | Bouton installé mais refuse d'envoyer | Configuration registre machine absente | Appliquer `resources/RegistryConfig.reg` ou l'ADMX — fail-close par conception |
+| « Compilation OK mais …`.dll` introuvable » | Produit renommé avec une chaîne ≤ v1.6.3, qui attendait le nom d'origine | Passer en v1.6.4 : le nom est lu dans le `.vbproj` |
 | « signtool.exe introuvable » | `tools/` non reporté (il n'est pas versionné) | Recopier `tools/` depuis le dossier précédent, ou `-NoSign` pour construire sans signer |

@@ -147,7 +147,19 @@ if (Test-Path $dopb) {
 
 $sln = Join-Path $ROOT "OutlookSpamAddin.sln"
 if (Test-Path $msiPath) { Remove-Item $msiPath -Force }   # garantit un MSI FRAIS
-$dllPath = Join-Path $ROOT ("OutlookSpamAddin\bin\" + $Configuration + "\BoutonSPAM.dll")
+# Nom de la DLL produite = <AssemblyName> du .vbproj, que 02_customize.sh ecrit
+# depuis PRODUCT_NAME. On le LIT ici au lieu de le coder en dur : sinon, des que
+# le produit est renomme - par exemple pour construire des variantes d'essai -
+# ce controle echoue alors que la compilation a parfaitement reussi.
+$vbprojPath = Join-Path $ROOT "OutlookSpamAddin\OutlookSpamAddin.vbproj"
+$asmName = $null
+if (Test-Path $vbprojPath) {
+  $mAsm = [regex]::Match((Get-Content -Raw -LiteralPath $vbprojPath), '<AssemblyName>\s*(.*?)\s*</AssemblyName>')
+  if ($mAsm.Success) { $asmName = $mAsm.Groups[1].Value }
+}
+if (-not $asmName) { $asmName = Get-ConfValue $conf "PRODUCT_NAME" }
+if (-not $asmName) { $asmName = "BoutonSPAM" }
+$dllPath = Join-Path $ROOT ("OutlookSpamAddin\bin\" + $Configuration + "\" + $asmName + ".dll")
 
 # --- Horodatage (manifeste + MSI) adapte a la CONNECTIVITE de ce build -------
 # Le .vbproj porte <ManifestTimestampUrl> : PENDANT la compilation, Visual Studio

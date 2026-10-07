@@ -15,6 +15,10 @@ Concise version history. Versions follow the add-in's 4-segment scheme
   refuse them: fail-close by design).
 - New-workstation bootstrap: `01_verification-poste.ps1 -Setup/-Install`
   (inventory, prerequisites, Visual Studio, offline layout, short-root rule).
+- **Renaming the product no longer breaks the build**: `04_build.ps1` reads the
+  assembly name from the `.vbproj` (written from `PRODUCT_NAME`) instead of
+  hardcoding it. Building variants — to compare several icons, for instance —
+  now works without touching the toolchain.
 - Signing prerequisite **checked before compiling**: a missing `signtool` is
   reported within seconds instead of after the whole build. `tools/`
   (signtool, python) is not versioned: carry it over between working folders,

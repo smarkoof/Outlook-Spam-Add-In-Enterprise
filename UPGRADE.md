@@ -29,6 +29,11 @@ Everything else — including `setup/Setup.vdproj` — comes from the release an
 is reset to repository defaults on every upgrade. That is fine: the values that
 matter are re-applied from `branding.conf` by `scripts/02_customize.sh`.
 
+> **The easy path: `scripts/92_migrate-release.ps1`.** It performs steps 1 to 3 below —
+> carrying your files over, pinning the `UPGRADE_CODE` read from your current folder,
+> raising `VERSION` — then reads the result back to verify it. Try `-Simulation` first,
+> which writes nothing. Your current folder is never modified.
+
 ## Step by step
 
 1. **Fetch the release into a fresh folder** (`git clone --branch <tag> …`, or

@@ -30,6 +30,11 @@ aux valeurs du dépôt à chaque mise à jour. C'est voulu : les valeurs qui
 comptent sont réappliquées depuis `branding.conf` par
 `scripts/02_customize.sh`.
 
+> **Le plus simple : `scripts/92_migrate-release.ps1`.** Il effectue les étapes 1 à 3
+> ci-dessous — reprise de vos fichiers, épinglage de l'`UPGRADE_CODE` relevé dans votre
+> dossier actuel, montée de `VERSION` — puis relit le résultat pour le vérifier. Essayez
+> d'abord avec `-Simulation`, qui n'écrit rien. Votre dossier actuel n'est jamais modifié.
+
 ## Pas à pas
 
 1. **Récupérer la release dans un dossier neuf** (`git clone --branch <tag> …`,

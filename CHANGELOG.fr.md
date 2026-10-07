@@ -16,6 +16,10 @@ Historique concis. Les versions suivent le schéma à 4 segments de l'add-in
 - Préparation de poste neuf : `01_verification-poste.ps1 -Setup/-Install`
   (inventaire, prérequis, Visual Studio, layout hors-ligne, règle de la
   racine courte).
+- **Script de migration livré** : `scripts/92_migrate-release.ps1` reprend votre
+  configuration, vos certificats et votre outillage dans le dossier d'une nouvelle
+  release, épingle l'`UPGRADE_CODE` de votre production et monte la version, puis
+  vérifie le résultat. Mode `-Simulation` sans écriture.
 - **Renommer le produit ne casse plus le build** : `04_build.ps1` lit le nom de
   l'assembly dans le `.vbproj` (écrit depuis `PRODUCT_NAME`) au lieu de le coder
   en dur. Construire des variantes — pour comparer plusieurs icônes, par exemple —

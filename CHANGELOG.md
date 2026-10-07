@@ -15,6 +15,10 @@ Concise version history. Versions follow the add-in's 4-segment scheme
   refuse them: fail-close by design).
 - New-workstation bootstrap: `01_verification-poste.ps1 -Setup/-Install`
   (inventory, prerequisites, Visual Studio, offline layout, short-root rule).
+- **Migration script shipped**: `scripts/92_migrate-release.ps1` carries your
+  configuration, certificates and tooling into a new release folder, pins your
+  production `UPGRADE_CODE`, raises the version, then verifies the result.
+  `-Simulation` mode writes nothing.
 - **Renaming the product no longer breaks the build**: `04_build.ps1` reads the
   assembly name from the `.vbproj` (written from `PRODUCT_NAME`) instead of
   hardcoding it. Building variants — to compare several icons, for instance —

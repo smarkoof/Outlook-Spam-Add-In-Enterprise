@@ -15,7 +15,33 @@ headers, attachments, sender…), attached to the report, then sent to your
 abuse mailbox. **French / English** interface (auto-detected, English
 fallback).
 
-![Outlook ribbon](pictures/outlook-classic-ribbon.png)
+The **Report this email** button sits in its own ribbon group. Its icon is
+chosen in `branding.conf` (`BUTTON_ICON`) among five icons provided by
+Office: nothing to ship, they follow the Outlook theme.
+
+**`PermissionRestrict`** — default
+
+[![Outlook ribbon, PermissionRestrict](pictures/ribbon-icon-PermissionRestrict.jpg)](pictures/ribbon-icon-PermissionRestrict.jpg)
+
+**`Risks`**
+
+[![Outlook ribbon, Risks](pictures/ribbon-icon-Risks.jpg)](pictures/ribbon-icon-Risks.jpg)
+
+**`SourceControlRun`**
+
+[![Outlook ribbon, SourceControlRun](pictures/ribbon-icon-SourceControlRun.jpg)](pictures/ribbon-icon-SourceControlRun.jpg)
+
+**`FilePermissionView`**
+
+[![Outlook ribbon, FilePermissionView](pictures/ribbon-icon-FilePermissionView.jpg)](pictures/ribbon-icon-FilePermissionView.jpg)
+
+**`CancelRequest`**
+
+[![Outlook ribbon, CancelRequest](pictures/ribbon-icon-CancelRequest.jpg)](pictures/ribbon-icon-CancelRequest.jpg)
+
+Any other value is rejected by `02_customize.sh`: an unknown identifier
+raises no error on the Office side, it would simply give a button with
+**no icon**.
 
 Two variants in this repository:
 

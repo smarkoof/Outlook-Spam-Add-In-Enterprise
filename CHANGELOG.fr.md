@@ -6,6 +6,20 @@ Historique concis. Les versions suivent le schéma à 4 segments de l'add-in
 (`branding.conf` → `VERSION`).
 
 ## v1.6.x et suivantes — variante OWA hybride, retours terrain
+- **Les cinq icônes du bouton sont illustrées** : `README.fr.md` montre le ruban
+  Outlook avec chacune des valeurs admises de `BUTTON_ICON`, nommée sous sa
+  capture. Choisir une icône ne demande plus de la construire pour la voir.
+- **Essais d'icônes en une passe** : `scripts/93_generate-icons.ps1` construit un
+  MSI par icône d'affilée et les rassemble dans `essais-icones\`, avec barre
+  d'état, chronomètre par icône et temps CPU de devenv — utile quand le poste de
+  build et le poste de test ne communiquent pas : un seul transfert. Le réglage
+  `BUTTON_ICON` d'origine est restauré même si un build échoue, et le paquet
+  produit est repéré à son horodatage, jamais à un nom supposé.
+- Le dossier produit reçoit un `INSTALLER.txt` : commandes `msiexec`
+  d'installation et de désinstallation pour chaque icône, ProductCode, état de
+  signature, codes de retour, et quoi faire sur une erreur 1625. Aucun script
+  n'accompagne les paquets : `msiexec` passe là où un `.ps1` est refusé par
+  AppLocker ou SRP.
 - **Complément web** (`webaddin/`) pour OWA et le nouvel Outlook : même
   signalement, servi depuis un hôte HTTPS interne ; configuration générée
   depuis `deploy.env` (fail-close sans destinataire).

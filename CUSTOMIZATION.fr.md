@@ -35,7 +35,7 @@ qui gère aussi l'incrément de version et le build du MSI.
 | `UI_GROUP_FR` / `_EN` | Nom du groupe dans le ruban |
 | `UI_BUTTON_TIP_FR` / `_EN` | Description courte au survol |
 | `UI_BUTTON_SUPERTIP_FR` / `_EN` | Grande info-bulle d'aide |
-| `BUTTON_ICON` | Icône du bouton (ruban **et** menus contextuels) — icône fournie par Office (`imageMso`) : `PermissionRestrict` (défaut), `Risks`, `SourceControlRun`, `FilePermissionView`, `CancelRequest`. Rien à livrer, suit le thème d'Outlook. Toute autre valeur est refusée par `02_customize.sh` |
+| `BUTTON_ICON` | Icône du bouton (ruban **et** menus contextuels) — icône fournie par Office (`imageMso`) : `PermissionRestrict` (défaut), `Risks`, `SourceControlRun`, `FilePermissionView`, `CancelRequest`. Rien à livrer, suit le thème d'Outlook. Toute autre valeur est refusée par `02_customize.sh`. Aperçu des cinq rubans : [README.fr.md](README.fr.md) |
 | `UI_CONFIRM_TITLE_FR` / `_EN` | Titre de la boîte de confirmation |
 | `UI_REPORT_BODY_FR` / `_EN` | Phrase d'introduction du rapport (vue par vos analystes) |
 | `UI_ACK_SUBJECT_FR` / `_EN` | Objet de l'accusé de réception automatique |

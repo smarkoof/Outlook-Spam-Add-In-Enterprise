@@ -6,6 +6,19 @@ Concise version history. Versions follow the add-in's 4-segment scheme
 (`branding.conf` → `VERSION`).
 
 ## v1.6.x and later — hybrid OWA variant, field feedback
+- **The five button icons are illustrated**: `README.md` shows the Outlook
+  ribbon with each accepted `BUTTON_ICON` value, named under its screenshot.
+  Picking an icon no longer requires building it to see it.
+- **Icon trials in one pass**: `scripts/93_generate-icons.ps1` builds one MSI
+  per icon back to back and gathers them in `essais-icones\`, with a progress
+  bar, per-icon timing and devenv CPU time — useful when the build machine and
+  the test machine cannot talk to each other: a single transfer. The original
+  `BUTTON_ICON` setting is restored even if a build fails, and the produced
+  package is found by its timestamp, never by a guessed name.
+- The output folder gets an `INSTALLER.txt`: `msiexec` install and uninstall
+  commands for each icon, ProductCode, signature state, return codes, and what
+  to do on error 1625. No script travels with the packages: `msiexec` goes
+  through where a `.ps1` is refused by AppLocker or SRP.
 - **Web add-in variant** (`webaddin/`) for OWA and the new Outlook: same
   reporting behaviour, served from an internal HTTPS host; configuration
   generated from `deploy.env` (fail-close if no recipient).

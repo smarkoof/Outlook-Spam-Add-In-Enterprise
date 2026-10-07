@@ -15,7 +15,33 @@ et l'analyse par votre équipe sécurité. Chaque e-mail signalé est évalué
 rapport, puis envoyé à votre boîte abuse. Interface **français / anglais**
 (détection automatique, anglais en repli).
 
-![Ruban Outlook](pictures/outlook-classic-ribbon.png)
+Le bouton **Signaler ce mail** occupe son propre groupe dans le ruban. Son
+icône se choisit dans `branding.conf` (`BUTTON_ICON`) parmi cinq icônes
+fournies par Office : rien à livrer, elles suivent le thème d'Outlook.
+
+**`PermissionRestrict`** — valeur par défaut
+
+[![Ruban Outlook, icône PermissionRestrict](pictures/ribbon-icon-PermissionRestrict.jpg)](pictures/ribbon-icon-PermissionRestrict.jpg)
+
+**`Risks`**
+
+[![Ruban Outlook, icône Risks](pictures/ribbon-icon-Risks.jpg)](pictures/ribbon-icon-Risks.jpg)
+
+**`SourceControlRun`**
+
+[![Ruban Outlook, icône SourceControlRun](pictures/ribbon-icon-SourceControlRun.jpg)](pictures/ribbon-icon-SourceControlRun.jpg)
+
+**`FilePermissionView`**
+
+[![Ruban Outlook, icône FilePermissionView](pictures/ribbon-icon-FilePermissionView.jpg)](pictures/ribbon-icon-FilePermissionView.jpg)
+
+**`CancelRequest`**
+
+[![Ruban Outlook, icône CancelRequest](pictures/ribbon-icon-CancelRequest.jpg)](pictures/ribbon-icon-CancelRequest.jpg)
+
+Toute autre valeur est refusée par `02_customize.sh` : un identifiant inconnu
+ne provoque aucune erreur côté Office, il donnerait simplement un bouton
+**sans icône**.
 
 Deux déclinaisons dans ce dépôt :
 

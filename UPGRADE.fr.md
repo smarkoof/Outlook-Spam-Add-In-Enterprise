@@ -42,7 +42,10 @@ comptent sont réappliquées depuis `branding.conf` par
    par-dessus).
 2. **Remettre vos fichiers** : `branding.conf`, `certs/`, `installers/`,
    `tools/`, et `webaddin/deploy/deploy.env` le cas échéant.
-3. **Monter `VERSION`** dans `branding.conf` — strictement supérieure à celle
+3. **Monter `VERSION`** dans `branding.conf`. Attention à ne pas la confondre avec
+   le numéro de release du dépôt (`v1.6.x`), qui ne concerne que la chaîne
+   d'outils : celle-ci est la version de *votre* bouton. Elle doit être
+   strictement supérieure à celle
    déployée (la chaîne refuse une baisse) — et adopter les nouveaux réglages :
    comparez votre fichier à `branding.conf.example` et lisez les notes de la
    release.

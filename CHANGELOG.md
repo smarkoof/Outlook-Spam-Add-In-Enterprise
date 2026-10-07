@@ -15,6 +15,17 @@ Concise version history. Versions follow the add-in's 4-segment scheme
   refuse them: fail-close by design).
 - New-workstation bootstrap: `01_verification-poste.ps1 -Setup/-Install`
   (inventory, prerequisites, Visual Studio, offline layout, short-root rule).
+- The migration script **no longer regresses documentation**: it never overwrites a
+  file already shipped by the release (the `README.md` files of `certs/` and
+  `installers/`), and reports which ones it preserved.
+- It **inventories `certs/`** before copying: subject, validity or expiry,
+  thumbprint, duplicates (same certificate under two names, identical files), plus a
+  reminder of the declared `CERT_THUMBPRINT`. It deletes nothing — losing a
+  certificate would be worse than keeping a spare — but pruning becomes an informed
+  choice.
+- **Versions kept apart**: the repository release number (`v1.6.x`) only concerns the
+  toolchain; your button's version (`branding.conf` → `VERSION`) is yours and follows
+  its own pace. The script and the guide now say so.
 - **Migration script shipped**: `scripts/92_migrate-release.ps1` carries your
   configuration, certificates and tooling into a new release folder, pins your
   production `UPGRADE_CODE`, raises the version, then verifies the result.

@@ -16,6 +16,16 @@ Historique concis. Les versions suivent le schéma à 4 segments de l'add-in
 - Préparation de poste neuf : `01_verification-poste.ps1 -Setup/-Install`
   (inventaire, prérequis, Visual Studio, layout hors-ligne, règle de la
   racine courte).
+- Le script de migration **ne régresse plus la documentation** : il n'écrase jamais
+  un fichier déjà fourni par la release (les `README.md` de `certs/` et
+  `installers/`), et dit lesquels il a conservés.
+- Il **inventorie `certs/`** avant de le copier : sujet, validité ou expiration,
+  empreinte, doublons (même certificat sous deux noms, fichiers identiques), et
+  rappel du `CERT_THUMBPRINT` déclaré. Il ne supprime rien — perdre un certificat
+  serait pire qu'en garder un de trop — mais l'élagage devient un choix éclairé.
+- **Versions distinguées** : le numéro de release du dépôt (`v1.6.x`) ne concerne
+  que la chaîne d'outils ; la version de votre bouton (`branding.conf` → `VERSION`)
+  vous appartient et suit son propre rythme. Le script et le guide le disent.
 - **Script de migration livré** : `scripts/92_migrate-release.ps1` reprend votre
   configuration, vos certificats et votre outillage dans le dossier d'une nouvelle
   release, épingle l'`UPGRADE_CODE` de votre production et monte la version, puis

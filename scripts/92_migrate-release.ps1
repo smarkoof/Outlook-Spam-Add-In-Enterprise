@@ -96,6 +96,50 @@ if (Test-Path -LiteralPath (Join-Path $Nouveau "branding.conf")) {
   Att "Un branding.conf existe déjà dans le dossier neuf : il va être REMPLACÉ par le vôtre."
 }
 
+# Lit un certificat sans mot de passe, quel que soit son format. Le constructeur
+# .NET gère le binaire (DER) et le PKCS#12 sans mot de passe, mais PAS le PEM sur
+# toutes les versions : on décode alors le bloc base64 soi-même, ce qui marche
+# aussi bien sous Windows PowerShell 5.1 que sous PowerShell 7.
+function Lire-Certificat([string]$chemin) {
+  try {
+    $c = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+    $c.Import($chemin, "", 'DefaultKeySet')
+    return $c
+  } catch { }
+  try {
+    $txt = [System.IO.File]::ReadAllText($chemin)
+    $m = [regex]::Match($txt, '-----BEGIN CERTIFICATE-----(.*?)-----END CERTIFICATE-----', 'Singleline')
+    if ($m.Success) {
+      $octets = [Convert]::FromBase64String(($m.Groups[1].Value -replace '\s', ''))
+      return New-Object System.Security.Cryptography.X509Certificates.X509Certificate2(, $octets)
+    }
+  } catch { }
+  return $null
+}
+
+# Copie le CONTENU d'un dossier sans jamais écraser un fichier déjà présent :
+# ce qui est déjà là vient de la RELEASE (les README de certs\ et installers\,
+# par exemple) et doit rester à jour. Sans cette règle, chaque migration
+# ramènerait l'ancienne documentation par-dessus la nouvelle.
+function Copier-Dossier {
+  param([string]$Src, [string]$Dst, [switch]$Essai)
+  $copies = 0
+  $conserves = @()
+  $racine = (Resolve-Path -LiteralPath $Src).Path
+  if (-not $Essai) { New-Item -ItemType Directory -Force -Path $Dst | Out-Null }
+  foreach ($f in @(Get-ChildItem -LiteralPath $Src -Recurse -File -Force -ErrorAction SilentlyContinue)) {
+    $rel = $f.FullName.Substring($racine.Length).TrimStart('\', '/')
+    $cible = Join-Path $Dst $rel
+    if (Test-Path -LiteralPath $cible) { $conserves += $rel; continue }
+    if (-not $Essai) {
+      New-Item -ItemType Directory -Force -Path (Split-Path -Parent $cible) | Out-Null
+      Copy-Item -LiteralPath $f.FullName -Destination $cible -Force
+    }
+    $copies++
+  }
+  return @{ Copies = $copies; Conserves = $conserves }
+}
+
 # ------------------------------------------------- 2. IDENTITÉ DE LA PRODUCTION
 Titre "IDENTITÉ DE VOTRE PRODUCTION"
 
@@ -137,8 +181,11 @@ Ok "UpgradeCode retenu : {$uc}"
 Detail "source : $origineUc"
 
 # ------------------------------------------------------------- 3. VERSION
-Titre "VERSION À PRODUIRE"
+Titre "VERSION DE VOTRE PRODUIT"
 
+Inf "À ne pas confondre avec le numéro de RELEASE du dépôt (v1.6.x), qui ne"
+Inf "concerne que la chaîne d'outils : la version de votre bouton vous appartient"
+Inf "et suit son propre rythme."
 try { $vA = [version]$versionAncienne } catch { Arret "VERSION actuelle illisible : $versionAncienne" }
 if (-not $Version) {
   $Version = "{0}.{1}.0.0" -f $vA.Major, ($vA.Minor + 1)
@@ -148,7 +195,7 @@ try { $vN = [version]$Version } catch { Arret "Version demandée invalide : $Ver
 if ($vN -le $vA) {
   Arret "La version demandée ($Version) n'est pas supérieure à l'actuelle ($versionAncienne). Une version ne diminue jamais."
 }
-Ok "Nouvelle VERSION : $Version   (précédente : $versionAncienne)"
+Ok "VERSION du produit (branding.conf) : $Version   (précédente : $versionAncienne)"
 
 # ------------------------------------------ 4. PLAN DE COPIE DE VOS FICHIERS
 Titre "VOS FICHIERS À REMETTRE EN PLACE"
@@ -169,6 +216,50 @@ if (Test-Path -LiteralPath $env1) {
   $aCopier += @{ Src = $env1; Dst = (Join-Path $Nouveau "webaddin\deploy\deploy.env"); Nom = "webaddin\deploy\deploy.env"; Type = "fichier" }
 } else { Inf "webaddin\deploy\deploy.env : absent, rien à copier" }
 foreach ($e in $aCopier) { Inf "à reprendre : $($e.Nom)" }
+
+# --- Inventaire de certs\ : un dossier de certificats accumule des exemplaires
+# périmés et des doublons. On ne supprime RIEN (perdre un certificat serait pire
+# qu'en garder un de trop), mais on dit ce qui est transporté, pour que l'élagage
+# soit un choix éclairé. Un .pfx protégé par mot de passe reste non inspectable.
+$dirCerts = Join-Path $Ancien "certs"
+if (Test-Path -LiteralPath $dirCerts -PathType Container) {
+  $fichiersCerts = @(Get-ChildItem -LiteralPath $dirCerts -File -Recurse -ErrorAction SilentlyContinue |
+                     Where-Object { $_.Name -ne "README.md" })
+  if ($fichiersCerts.Count -gt 0) {
+    Write-Host ""
+    Inf ("contenu de certs\ (" + $fichiersCerts.Count + " fichier(s)) :")
+    $empreintes = @{}
+    $condenses  = @{}
+    foreach ($fc in $fichiersCerts) {
+      $cert = Lire-Certificat $fc.FullName
+      if ($cert) {
+        $jours = [int]($cert.NotAfter - (Get-Date)).TotalDays
+        $etat  = if ($jours -lt 0) { "EXPIRÉ depuis " + (-$jours) + " j" }
+                 elseif ($jours -le 90) { "expire dans " + $jours + " j" }
+                 else { "valide (" + $jours + " j)" }
+        Detail ($fc.Name + "  —  " + $etat)
+        Detail ("    " + $cert.Subject)
+        Detail ("    empreinte " + $cert.Thumbprint)
+        if ($empreintes.ContainsKey($cert.Thumbprint)) {
+          Att ("  doublon : même certificat que " + $empreintes[$cert.Thumbprint])
+        } else { $empreintes[$cert.Thumbprint] = $fc.Name }
+      } else {
+        Detail ($fc.Name + "  —  protégé par mot de passe : contenu non vérifiable ici")
+      }
+      $h = (Get-FileHash -LiteralPath $fc.FullName -Algorithm SHA256).Hash
+      if ($condenses.ContainsKey($h)) {
+        Att ("  fichier identique à " + $condenses[$h])
+      } else { $condenses[$h] = $fc.Name }
+    }
+    $emp = ValeurCle $contenuAncien "CERT_THUMBPRINT"
+    if ($emp) {
+      Detail ("CERT_THUMBPRINT déclaré : " + $emp)
+      Detail ("c'est celui-ci que le build utilisera, et il doit être dans le magasin")
+      Detail ("Windows du poste — ce que 04_build.ps1 vérifie avant de compiler.")
+    }
+    Write-Host ""
+  }
+}
 
 # ------------------------------------------- 5. NOUVEAU branding.conf (mémoire)
 # On construit d'abord le contenu complet, on n'écrit qu'ensuite.
@@ -210,7 +301,15 @@ Titre "APPLICATION"
 
 if ($Simulation) {
   Att "Mode simulation : RIEN n'est écrit."
-  foreach ($e in $aCopier) { Detail "copierait $($e.Nom)  ->  $($e.Dst)" }
+  foreach ($e in $aCopier) {
+    if ($e.Type -eq "dossier") {
+      $r = Copier-Dossier -Src $e.Src -Dst $e.Dst -Essai
+      Detail ("copierait " + $e.Nom + " -> " + $r.Copies + " fichier(s)")
+      if ($r.Conserves.Count -gt 0) {
+        Detail ("  conserverait depuis la release : " + ($r.Conserves -join ", "))
+      }
+    } else { Detail "copierait $($e.Nom)  ->  $($e.Dst)" }
+  }
   Detail "écrirait branding.conf avec VERSION=$Version et UPGRADE_CODE={$uc}"
   if ($ajoutees.Count -gt 0) { Detail "clés ajoutées : $($ajoutees -join ', ')" }
   Write-Host ""
@@ -219,18 +318,16 @@ if ($Simulation) {
 
 foreach ($e in $aCopier) {
   if ($e.Type -eq "dossier") {
-    New-Item -ItemType Directory -Force -Path $e.Dst | Out-Null
-    # on énumère le contenu plutôt que d'utiliser un joker : un dossier vide
-    # ne doit pas faire échouer la migration, et rien ne doit s'imbriquer.
-    $items = @(Get-ChildItem -LiteralPath $e.Src -Force -ErrorAction SilentlyContinue)
-    if ($items.Count -gt 0) {
-      Copy-Item -Path $items.FullName -Destination $e.Dst -Recurse -Force
+    $r = Copier-Dossier -Src $e.Src -Dst $e.Dst
+    Ok ("repris : " + $e.Nom + "  -> " + $r.Copies + " fichier(s) copié(s)")
+    if ($r.Conserves.Count -gt 0) {
+      Detail ("conservé(s) depuis la release, donc à jour : " + ($r.Conserves -join ", "))
     }
   } else {
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $e.Dst) | Out-Null
     Copy-Item -LiteralPath $e.Src -Destination $e.Dst -Force
+    Ok "repris : $($e.Nom)"
   }
-  Ok "repris : $($e.Nom)"
 }
 
 Ecrire (Join-Path $Nouveau "branding.conf") $nouveauContenu

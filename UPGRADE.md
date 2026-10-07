@@ -40,7 +40,9 @@ matter are re-applied from `branding.conf` by `scripts/02_customize.sh`.
    unzip the release archive next to your current folder — never on top of it).
 2. **Put your files back**: `branding.conf`, `certs/`, `installers/`, `tools/`,
    and `webaddin/deploy/deploy.env` if applicable.
-3. **Raise `VERSION`** in `branding.conf` — it must be strictly higher than the
+3. **Raise `VERSION`** in `branding.conf`. Do not confuse it with the repository
+   release number (`v1.6.x`), which only concerns the toolchain: this one is *your*
+   button's version. It must be strictly higher than the
    deployed one (the toolchain refuses a decrease), and adopt any new settings:
    compare your file with `branding.conf.example` and read the release notes.
 4. **Build**: `.\scripts\05_assistant.ps1` (guided) or `.\scripts\04_build.ps1`,
